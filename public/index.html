@@ -14,7 +14,7 @@
     <button onclick="sendMessage()">Send</button>
     <ul id="chat"></ul>
     <script>
-      const socket = new WebSocket("ws://localhost:3000");
+      const socket = new WebSocket(`ws://localhost:3000`);
 
       socket.addEventListener("message", (event) => {
         const chat = document.getElementById("chat");

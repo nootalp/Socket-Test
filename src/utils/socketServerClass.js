@@ -28,8 +28,9 @@ class SocketChatServer {
     this.clients.add(ws);
     ws.on("message", (message) => {
       this.broadcastMessage(message, ws);
-    });
-    ws.on("close", () => this.clients.delete(ws));
+    }).on("close", () => this.clients.delete(ws));
+
+    client.send(JSON.stringify({ connection: "ok" }));
   }
 
   broadcastMessage(message, sender) {

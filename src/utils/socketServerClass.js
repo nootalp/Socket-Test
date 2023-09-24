@@ -6,32 +6,29 @@ const { URI } = require("./configServer");
 class SocketChatServer {
   constructor(port) {
     this.port = port;
-    this.server = http.createServer(this.handleHttpRequest);
+    this.server = http.createServer(this.handleHttpRequest.bind(this));
     this.wss = new WebSocket.Server({ server: this.server });
+    this.wss.on("connection", this.handleWebSocketConnection.bind(this));
     this.clients = new Set();
-
-    this.wss.on("connection", this.handleWebSocketConnection);
   }
 
   handleHttpRequest(_, res) {
     fs.readFile("public/index.html", (err, data) => {
       if (err) {
-        res.writeHead(404, { "Content-Type": "text/html" });
-        res.end("404 Not Found");
+        res
+          .writeHead(404, { "Content-Type": "text/html" })
+          .end("404 Not Found");
       } else {
-        res.writeHead(200, { "Content-Type": "text/html" });
-        res.end(data);
+        res.writeHead(200, { "Content-Type": "text/html" }).end(data);
       }
     });
   }
 
   handleWebSocketConnection(ws) {
     this.clients.add(ws);
-
     ws.on("message", (message) => {
-      this.broadcastMessage(messageString, ws);
+      this.broadcastMessage(message, ws);
     });
-
     ws.on("close", () => this.clients.delete(ws));
   }
 

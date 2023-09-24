@@ -5,18 +5,24 @@
     <title>WebSocket Chat</title>
   </head>
   <body>
-    <input type="text" id="message" placeholder="Enter your message" />
+    <input
+      type="text"
+      id="message"
+      placeholder="Enter your message"
+      onkeydown="handleKeyPress(event)"
+    />
     <button onclick="sendMessage()">Send</button>
     <ul id="chat"></ul>
     <script>
       const socket = new WebSocket("ws://localhost:3000");
-      socket.binaryType = "blob";
 
-      socket.addEventListener("message", async (event) => {
+      socket.addEventListener("message", (event) => {
         const chat = document.getElementById("chat");
         const message = document.createElement("li");
-        const text = await event.data.text();
+
+        const text = event.data;
         message.textContent = text;
+
         chat.appendChild(message);
       });
 
@@ -31,6 +37,14 @@
 
         socket.send(message);
         input.value = "";
+
+        input.focus();
+      }
+
+      function handleKeyPress(event) {
+        if (event.key === "Enter") {
+          sendMessage();
+        }
       }
     </script>
   </body>

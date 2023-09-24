@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>WebSocket Chat</title>
+  </head>
+  <body>
+    <input type="text" id="message" placeholder="Enter your message" />
+    <button onclick="sendMessage()">Send</button>
+    <ul id="chat"></ul>
+    <script>
+      const socket = new WebSocket("ws://localhost:3000");
+      socket.binaryType = "blob";
+
+      socket.addEventListener("message", async (event) => {
+        const chat = document.getElementById("chat");
+        const message = document.createElement("li");
+        const text = await event.data.text();
+        message.textContent = text;
+        chat.appendChild(message);
+      });
+
+      function sendMessage() {
+        const input = document.getElementById("message");
+        const message = input.value;
+
+        const chat = document.getElementById("chat");
+        const senderMessage = document.createElement("li");
+        senderMessage.textContent = "You: " + message;
+        chat.appendChild(senderMessage);
+
+        socket.send(message);
+        input.value = "";
+      }
+    </script>
+  </body>
+</html>

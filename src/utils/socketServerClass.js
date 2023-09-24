@@ -14,10 +14,8 @@ class SocketChatServer {
 
   handleHttpRequest(req, res) {
     if (req.url === "/chatHandler.js") {
-      // Se o URL for "/chatHandler.js", sirva o arquivo JavaScript.
       this.serveJavaScriptFile(req, res);
     } else {
-      // Caso contrário, sirva o arquivo HTML.
       fs.readFile("public/index.html", (err, data) => {
         if (err) {
           res
@@ -50,7 +48,7 @@ class SocketChatServer {
       this.broadcastMessage(message, ws);
     }).on("close", () => this.clients.delete(ws));
 
-    ws.send(JSON.stringify({ connection: "ok" })); // Envie a confirmação de conexão para o cliente.
+    ws.send(JSON.stringify({ connection: "ok" }));
   }
 
   broadcastMessage(message, sender) {

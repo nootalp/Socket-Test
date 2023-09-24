@@ -12,14 +12,34 @@ class SocketChatServer {
     this.clients = new Set();
   }
 
-  handleHttpRequest(_, res) {
-    fs.readFile("public/index.html", (err, data) => {
+  handleHttpRequest(req, res) {
+    if (req.url === "/chatHandler.js") {
+      // Se o URL for "/chatHandler.js", sirva o arquivo JavaScript.
+      this.serveJavaScriptFile(req, res);
+    } else {
+      // Caso contrário, sirva o arquivo HTML.
+      fs.readFile("public/index.html", (err, data) => {
+        if (err) {
+          res
+            .writeHead(404, { "Content-Type": "text/html" })
+            .end("404 Not Found");
+        } else {
+          res.writeHead(200, { "Content-Type": "text/html" }).end(data);
+        }
+      });
+    }
+  }
+
+  serveJavaScriptFile(req, res) {
+    fs.readFile("public/chatHandler.js", (err, data) => {
       if (err) {
         res
           .writeHead(404, { "Content-Type": "text/html" })
           .end("404 Not Found");
       } else {
-        res.writeHead(200, { "Content-Type": "text/html" }).end(data);
+        res
+          .writeHead(200, { "Content-Type": "application/javascript" })
+          .end(data);
       }
     });
   }
@@ -30,7 +50,7 @@ class SocketChatServer {
       this.broadcastMessage(message, ws);
     }).on("close", () => this.clients.delete(ws));
 
-    client.send(JSON.stringify({ connection: "ok" }));
+    ws.send(JSON.stringify({ connection: "ok" })); // Envie a confirmação de conexão para o cliente.
   }
 
   broadcastMessage(message, sender) {

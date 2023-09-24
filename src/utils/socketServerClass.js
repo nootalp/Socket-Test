@@ -12,32 +12,14 @@ class SocketChatServer {
     this.clients = new Set();
   }
 
-  handleHttpRequest(req, res) {
-    if (req.url === "/chatHandler.js") {
-      this.serveJavaScriptFile(req, res);
-    } else {
-      fs.readFile("public/index.html", (err, data) => {
-        if (err) {
-          res
-            .writeHead(404, { "Content-Type": "text/html" })
-            .end("404 Not Found");
-        } else {
-          res.writeHead(200, { "Content-Type": "text/html" }).end(data);
-        }
-      });
-    }
-  }
-
-  serveJavaScriptFile(req, res) {
-    fs.readFile("public/chatHandler.js", (err, data) => {
+  handleHttpRequest(_, res) {
+    fs.readFile("public/index.html", (err, data) => {
       if (err) {
         res
           .writeHead(404, { "Content-Type": "text/html" })
           .end("404 Not Found");
       } else {
-        res
-          .writeHead(200, { "Content-Type": "application/javascript" })
-          .end(data);
+        res.writeHead(200, { "Content-Type": "text/html" }).end(data);
       }
     });
   }

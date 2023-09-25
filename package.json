@@ -4,11 +4,12 @@
   "description": "",
   "main": "Server.js",
   "scripts": {
-    "start": "nodemon ./src/Server.js"  
+    "start": "nodemon ./src/Server.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "express": "^4.18.2",
     "http": "^0.0.1-security",
     "node-static": "^0.7.11",
     "ws": "^8.14.2"

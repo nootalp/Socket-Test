@@ -1,4 +1,4 @@
-const SocketChatServer = require("./utils/socketServerClass.js");
+const ExpressServer = require("./utils/expressServerClass.js");
 const { httpPort } = require("./utils/configServer.js");
 
-const Server = new SocketChatServer(httpPort).init();
+new ExpressServer(httpPort);

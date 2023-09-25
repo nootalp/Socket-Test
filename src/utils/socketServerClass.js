@@ -1,27 +1,10 @@
 const WebSocket = require("ws");
-const http = require("http");
-const fs = require("fs");
-const { URI } = require("./configServer");
 
-class SocketChatServer {
-  constructor(port) {
-    this.port = port;
-    this.server = http.createServer(this.handleHttpRequest.bind(this));
-    this.wss = new WebSocket.Server({ server: this.server });
-    this.wss.on("connection", this.handleWebSocketConnection.bind(this));
+class WebSocketServer {
+  constructor(server) {
+    this.wss = new WebSocket.Server({ server });
     this.clients = new Set();
-  }
-
-  handleHttpRequest(_, res) {
-    fs.readFile("public/index.html", (err, data) => {
-      if (err) {
-        res
-          .writeHead(404, { "Content-Type": "text/html" })
-          .end("404 Not Found");
-      } else {
-        res.writeHead(200, { "Content-Type": "text/html" }).end(data);
-      }
-    });
+    this.wss.on("connection", this.handleWebSocketConnection.bind(this));
   }
 
   handleWebSocketConnection(ws) {
@@ -40,12 +23,6 @@ class SocketChatServer {
       }
     });
   }
-
-  init() {
-    this.server.listen(this.port, () =>
-      console.log(`Server running on ${URI}`)
-    );
-  }
 }
 
-module.exports = SocketChatServer;
+module.exports = WebSocketServer;

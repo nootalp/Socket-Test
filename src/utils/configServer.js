@@ -1,10 +1,12 @@
-const projectDirectory = process.cwd();
+const __projectDirectory = process.cwd();
 
 module.exports = {
-  __dirname: projectDirectory,
+  __projectDirectory,
   httpPort: 3000 || process.env.PORT,
-
-  get URI() {
+  get webSocketURI() {
+    return `ws://localhost:${this.httpPort}/`;
+  },
+  get httpURI() {
     return `http://localhost:${this.httpPort}/`;
   },
 };

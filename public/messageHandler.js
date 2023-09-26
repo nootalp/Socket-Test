@@ -28,5 +28,3 @@ function handleKeyPress(event) {
     sendMessage();
   }
 }
-
-// Adicione manipuladores de eventos aqui, como um clique em botões.

@@ -14,7 +14,9 @@ class ExpressServer {
     /** Routes. */
     this.webApp
       .get("/", (_, res) =>
-        res.sendFile(path.join(__projectDirectory, "public", "index.html"))
+        res.sendFile(
+          path.join(__projectDirectory, "public", "markup", "index.html")
+        )
       )
       .use(
         "/public",

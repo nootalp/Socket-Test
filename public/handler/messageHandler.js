@@ -2,9 +2,13 @@ const socket = new WebSocket(`ws://localhost:3000`);
 
 socket.addEventListener("message", (event) => {
   const chat = document.getElementById("chat");
-  const message = document.createElement("li");
-  message.textContent = event.data;
-  chat.appendChild(message);
+  chat.innerHTML += `<li>${event.data}</li>`;
+});
+
+socket.addEventListener("close", (event) => {
+  if (event.wasClean) {
+    console.log("Connection closed sucessfully.");
+  }
 });
 
 function sendMessage() {
@@ -14,9 +18,7 @@ function sendMessage() {
   if (!messageText) return;
 
   const chat = document.getElementById("chat");
-  const senderMessage = document.createElement("li");
-  senderMessage.textContent = "You: " + messageText;
-  chat.appendChild(senderMessage);
+  chat.innerHTML += `<li>You: ${messageText}</li>`;
 
   socket.send(messageText);
   input.value = "";

@@ -4,7 +4,69 @@ class WebSocketServer {
   constructor(server) {
     this.wss = new WebSocket.Server({ server });
     this.clients = new Map();
+    /** Ensures that the event callback references the scope of the class with 'bind()'. */
     this.wss.on("connection", this.handleWebSocketConnection.bind(this));
+  }
+
+  getClientId(ws) {
+    return ws._socket.remoteAddress + ws._socket.remotePort;
+  }
+
+  handleWebSocketConnection(ws, req) {
+    const clientId = this.getClientId(ws);
+    if (this.addClient(clientId, ws, req)) {
+      this.sendConnectionmessage(ws);
+    }
+
+    ws.on("message", async (message) => {
+      try {
+        const textMessage = await this.decodeMessage(message);
+        this.broadcastMessage(textMessage, ws);
+      } catch (err) {
+        console.error("Error decoding message: ", err);
+      }
+    });
+
+    ws.on("close", () => {
+      this.removeClient(clientId);
+    });
+  }
+
+  sendConnectionmessage(ws) {
+    const jsonMessage = JSON.stringify({ connection: "ok" });
+    ws.send(jsonMessage, (error) => {
+      if (error) {
+        console.error("Error sending message to client: ", error);
+      }
+    });
+  }
+
+  removeClient(clientId) {
+    this.clients.delete(clientId);
+    console.log(`Closing connection for client ${clientId}`);
+  }
+
+  addClient(connectionInfo, ws, req) {
+    try {
+      this.clients.set(connectionInfo, {
+        socket: ws,
+        connectionTime: new Date(),
+        userAgent: req.headers["user-agent"],
+        clientIPAddress: req.socket.remoteAddress,
+      });
+
+      const { connectionTime, userAgent, clientIPAddress } =
+        this.clients.get(connectionInfo);
+
+      console.log(
+        `${connectionInfo}\n${connectionTime}\n${userAgent}\n${clientIPAddress}`
+      );
+
+      return true;
+    } catch (err) {
+      console.log("Error to add client: ", err);
+      return false;
+    }
   }
 
   async decodeMessage(blobMessage) {
@@ -15,47 +77,6 @@ class WebSocketServer {
       } catch (err) {
         console.error("Error to process message: ", err);
         reject(err);
-      }
-    });
-  }
-
-  handleWebSocketConnection(ws, req) {
-    const clientId = ws._socket.remoteAddress + ws._socket.remotePort;
-
-    this.clients.set(clientId, {
-      socket: ws,
-      connectionTime: new Date(),
-      userAgent: req.headers["user-agent"],
-      clientIPAddress: req.socket.remoteAddress,
-    });
-    const { connectionTime, userAgent, clientIPAddress } =
-      this.clients.get(clientId);
-
-    console.log(
-      `Client ${clientId}\nConnected at ${connectionTime}\nWith ${userAgent},\nIP: ${clientIPAddress}.`
-    );
-
-    ws.on("message", async (message) => {
-      try {
-        const textMessage = await this.decodeMessage(message);
-        this.broadcastMessage(textMessage, ws);
-      } catch (err) {
-        console.error("Error: ", err);
-      }
-    });
-
-    ws.on("close", () => {
-      try {
-        console.log(`Closing ${clientId} connection...`);
-        this.clients.delete(clientId);
-      } catch (err) {
-        console.error(`Error closing client: ${err}`);
-      }
-    });
-
-    ws.send(JSON.stringify({ connection: "ok" }), (error) => {
-      if (error) {
-        console.error("Error sending message to client: ", error);
       }
     });
   }

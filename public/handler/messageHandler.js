@@ -1,8 +1,14 @@
 const socket = new WebSocket(`ws://localhost:3000`);
 
+socket.onmessage = function (event) {
+  const receivedMessage = JSON.parse(event.data);
+  console.log(receivedMessage);
+};
+
 socket.addEventListener("message", (event) => {
   const chat = document.getElementById("chat");
-  chat.innerHTML += `<li>${event.data}</li>`;
+  if (event.data === JSON.stringify({ connection: "ok" })) return;
+  else chat.innerHTML += `<li>${event.data}</li>`;
 });
 
 socket.addEventListener("close", (event) => {

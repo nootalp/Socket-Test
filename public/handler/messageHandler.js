@@ -1,8 +1,12 @@
 const socket = new WebSocket(`ws://localhost:3000`);
 
 socket.onmessage = function (event) {
-  const receivedMessage = JSON.parse(event.data);
-  console.log(receivedMessage);
+  try {
+    const receivedMessage = JSON.parse(event.data);
+    console.log(receivedMessage);
+  } catch (error) {
+    console.log("Received non-JSON message:", event.data);
+  }
 };
 
 socket.addEventListener("message", (event) => {

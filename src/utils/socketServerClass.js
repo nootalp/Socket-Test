@@ -1,38 +1,46 @@
 const WebSocket = require("ws");
+const { Client, Message } = require("../models/objectModels");
 
 class WebSocketServer {
   constructor(server) {
     this.wss = new WebSocket.Server({ server });
     this.clients = new Map();
-    /** Ensures that the event callback references the scope of the class with 'bind()'. */
+    /** Ensures that the event callback references the scope of the class with 'bind()'.
+     *  wss.on('connection', (ws, req) => { ... } */
     this.wss.on("connection", this.handleWebSocketConnection.bind(this));
   }
 
-  getClientId(ws) {
-    return ws._socket.remoteAddress + ws._socket.remotePort;
-  }
-
   handleWebSocketConnection(ws, req) {
-    const clientId = this.getClientId(ws);
-    if (this.addClient(clientId, ws, req)) {
-      this.sendConnectionmessage(ws);
+    const newClient = this.createClient(ws, req);
+    if (this.addClient(newClient)) {
+      this.sendConnectionMessage(ws);
     }
 
-    ws.on("message", async (message) => {
-      try {
-        const textMessage = await this.decodeMessage(message);
-        this.broadcastMessage(textMessage, ws);
-      } catch (err) {
-        console.error("Error decoding message: ", err);
-      }
-    });
-
-    ws.on("close", () => {
-      this.removeClient(clientId);
-    });
+    ws.on("message", this.handleReceivedMessage.bind(this, newClient));
+    ws.on("close", this.handleClientClosure.bind(this, newClient));
   }
 
-  sendConnectionmessage(ws) {
+  createClient(ws, req) {
+    return new Client(
+      ws,
+      new Date(),
+      req.headers["user-agent"],
+      req.socket.remoteAddress
+    );
+  }
+
+  addClient(newClient) {
+    try {
+      this.clients.set(newClient.clientId, newClient);
+      this.logClientInfo(newClient);
+      return true;
+    } catch (err) {
+      console.error("Error adding client: ", err);
+      return false;
+    }
+  }
+
+  sendConnectionMessage(ws) {
     const jsonMessage = JSON.stringify({ connection: "ok" });
     ws.send(jsonMessage, (error) => {
       if (error) {
@@ -41,60 +49,42 @@ class WebSocketServer {
     });
   }
 
-  removeClient(clientId) {
-    this.clients.delete(clientId);
-    console.log(`Closing connection for client ${clientId}`);
-  }
-
-  addClient(connectionInfo, ws, req) {
+  handleReceivedMessage(client, message) {
     try {
-      this.clients.set(connectionInfo, {
-        socket: ws,
-        connectionTime: new Date(),
-        userAgent: req.headers["user-agent"],
-        clientIPAddress: req.socket.remoteAddress,
-      });
-
-      const { connectionTime, userAgent, clientIPAddress } =
-        this.clients.get(connectionInfo);
-
-      console.log(
-        `${connectionInfo}\n${connectionTime}\n${userAgent}\n${clientIPAddress}`
-      );
-
-      return true;
+      const textMessage = this.decodeMessage(message);
+      const receivedMessage = new Message(client.clientId, textMessage);
+      console.log(`[${client.clientId}]: ${receivedMessage.content}`);
+      this.broadcastMessage(textMessage, client.socket);
     } catch (err) {
-      console.log("Error to add client: ", err);
-      return false;
+      console.error("Error decoding message: ", err);
     }
   }
 
-  async decodeMessage(blobMessage) {
-    return new Promise((resolve, reject) => {
-      try {
-        const textMessage = Buffer.from(blobMessage).toString("utf-8");
-        resolve(textMessage);
-      } catch (err) {
-        console.error("Error to process message: ", err);
-        reject(err);
-      }
-    });
+  handleClientClosure(client) {
+    this.clients.delete(client.clientId);
+    console.log(`Closing connection for client ${client.clientId}`);
+  }
+
+  logClientInfo(client) {
+    const { clientId, connectionTime, userAgent, clientIPAddress } = client;
+    console.log(
+      `${clientId}\n${connectionTime}\n${userAgent}\n${clientIPAddress}`
+    );
+  }
+
+  decodeMessage(blobMessage) {
+    return Buffer.from(blobMessage).toString("utf-8");
   }
 
   broadcastMessage(message, sender) {
-    Array.from(this.clients.values())
-      .filter(
-        (client) =>
-          client.socket !== sender &&
-          client.socket.readyState === WebSocket.OPEN
-      )
-      .forEach((client) => {
-        client.socket.send(message, (error) => {
-          if (error) {
-            console.error("Error broadcasting message to client: ", error);
-          }
-        });
-      });
+    const canReceiveMessage = (client) =>
+      client.socket !== sender && client.socket.readyState === WebSocket.OPEN;
+
+    for (const client of this.clients.values()) {
+      if (canReceiveMessage(client)) {
+        client.socket.send(message);
+      }
+    }
   }
 }
 

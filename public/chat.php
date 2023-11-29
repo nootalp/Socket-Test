@@ -6,6 +6,7 @@
     <link rel="shortcut icon" href="#" />
   </head>
   <body>
+  <h1>Welcome to the chat, <?php echo $_GET['username']; ?>!</h1>
     <input
       type="text"
       id="message"
@@ -14,6 +15,11 @@
     />
     <button onclick="sendMessage()">Send</button>
     <ul id="chat"></ul>
-    <script src="/public/handler/messageHandler.js"></script>
+  
+    <script type="text/javascript">
+      var username = "<?php Print($_GET['username']); ?>";
+    </script>
+
+    <script src="/src/processData/messageHandler.js"></script>
   </body>
 </html>

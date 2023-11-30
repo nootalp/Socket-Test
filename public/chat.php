@@ -15,11 +15,6 @@
     />
     <button onclick="sendMessage()">Send</button>
     <ul id="chat"></ul>
-  
-    <script type="text/javascript">
-      var username = "<?php Print($_GET['username']); ?>";
-    </script>
-
     <script src="/src/processData/messageHandler.js"></script>
   </body>
 </html>

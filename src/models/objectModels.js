@@ -1,12 +1,16 @@
 const { v4: uuidv4 } = require("uuid");
+const Routes = require("../utils/routes");
 
 class Client {
-  constructor(socket, connectionTime, userAgent, clientIPAddress) {
-    this.socket = socket;
-    this.connectionTime = connectionTime;
-    this.userAgent = userAgent;
-    this.clientIPAddress = clientIPAddress;
-    this.clientId = Client.generateClientId();
+  constructor(socket, userAgent, IpAddress) {
+    this.messageData = {
+      socket,
+      userAgent,
+      IpAddress,
+      connectionTime: new Date(),
+      Id: Client.generateClientId(),
+      username: new Routes().returnUsername() || "Default",
+    };
   }
 
   static generateClientId() {
@@ -16,22 +20,15 @@ class Client {
 
 class Message {
   constructor(senderId, content) {
-    this.senderId = senderId;
-    this.content = content;
-    this.timestamp = new Date();
-  }
-
-  toJSON() {
-    return {
-      senderId: this.senderId,
-      content: this.content,
-      timestamp: this.timestamp,
+    this.messageData = {
+      senderId,
+      content,
+      timestamp: new Date(),
     };
   }
 
-  static fromJSON(json) {
-    const { senderId, content } = json;
-    return new Message(senderId, content);
+  static toJSON() {
+    return { ...this.messageData };
   }
 }
 

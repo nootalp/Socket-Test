@@ -1,16 +1,39 @@
 const express = require("express");
 const path = require("path");
-const appRoutes = express.Router();
 const { __projectDirectory } = require("./configServer");
 
-/** Routes. */
-appRoutes
-  .get("/", (_, res) =>
-    res.sendFile(path.join(__projectDirectory, "public", "usernameSetup.html"))
-  )
-  .post("/processUsername", (req, res) => {
-    const username = req.body.username;
-    res.redirect(`/public/chat.php?username=${encodeURIComponent(username)}`);
-  });
+let usernameFromRequest = null;
 
-module.exports = appRoutes;
+class Routes {
+  constructor() {
+    this.appRoutes = express.Router();
+    this.projectDirectory = __projectDirectory;
+    this.setupRoutes();
+  }
+
+  setupRoutes() {
+    this.appRoutes
+      .get("/", (_, res) =>
+        res.sendFile(
+          path.join(this.projectDirectory, "public", "usernameSetup.html")
+        )
+      )
+
+      .post("/processUsername", (req, res) => {
+        usernameFromRequest = req.body.username;
+        res.redirect(
+          `/public/chat.php?username=${encodeURIComponent(usernameFromRequest)}`
+        );
+      });
+  }
+
+  returnUsername() {
+    return usernameFromRequest;
+  }
+
+  returnRoutes() {
+    return this.appRoutes;
+  }
+}
+
+module.exports = Routes;

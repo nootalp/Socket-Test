@@ -21,11 +21,6 @@ socket.addEventListener("close", (event) => {
   }
 });
 
-function getUsername() {
-  var username = window.username;
-  return username;
-}
-
 function sendMessage() {
   const input = document.getElementById("message");
   const messageText = input.value.trim();

@@ -1,10 +1,11 @@
 const express = require("express");
 const http = require("http");
-const bodyParser = require("body-parser");
-const { createProxyMiddleware } = require("http-proxy-middleware");
 const WebSocketServer = require("./socketServerClass");
-const { httpURI, __projectDirectory } = require("./configServer");
+const bodyParser = require("body-parser");
+const cookieParser = require("cookie-parser");
 const path = require("path");
+const { createProxyMiddleware } = require("http-proxy-middleware");
+const { httpURI, __projectDirectory } = require("./configServer");
 
 class ExpressServer {
   constructor(port, routes) {
@@ -21,6 +22,7 @@ class ExpressServer {
   expressConfig() {
     this.mainApp
       .use(bodyParser.urlencoded({ extended: true }))
+      .use(cookieParser())
       .use(
         "/public/chat.php",
         createProxyMiddleware({

@@ -11,28 +11,31 @@ class WebSocketServer {
   }
 
   handleWebSocketConnection(ws, req) {
-    const newClient = this.createClient(ws, req);
-    if (this.addClient(newClient)) {
+    const newClient = this.createClientAttributes(ws, req).messageData;
+    if (this.registerClient(newClient)) {
       this.sendConnectionMessage(ws);
+      this.printConnectedClients();
     }
-
-    ws.on("message", this.handleReceivedMessage.bind(this, newClient));
+    ws.on("message", this.processReceivedMessage.bind(this, newClient));
     ws.on("close", this.handleClientClosure.bind(this, newClient));
   }
 
-  createClient(ws, req) {
-    return new Client(
-      ws,
-      new Date(),
-      req.headers["user-agent"],
-      req.socket.remoteAddress
-    );
+  printConnectedClients() {
+    console.log("-------------------");
+    console.log("Connected Clients:");
+    for (const clientId of this.clients.keys())
+      console.log(`Client ID: ${clientId}`);
+    console.log("-------------------");
   }
 
-  addClient(newClient) {
+  createClientAttributes(ws, req) {
+    return new Client(ws, req.headers["user-agent"], req.socket.remoteAddress);
+  }
+
+  registerClient(client) {
     try {
-      this.clients.set(newClient.clientId, newClient);
-      this.logClientInfo(newClient);
+      this.clients.set(client.Id, client);
+      this.logClientInfo(client);
       return true;
     } catch (err) {
       console.error("Error adding client: ", err);
@@ -49,11 +52,12 @@ class WebSocketServer {
     });
   }
 
-  handleReceivedMessage(client, message) {
+  processReceivedMessage(client, message) {
     try {
       const textMessage = this.decodeMessage(message);
-      const receivedMessage = new Message(client.clientId, textMessage);
-      console.log(`[${client.clientId}]: ${receivedMessage.content}`);
+      const receivedMessage = new Message(client.Id, textMessage).messageData;
+
+      console.log(`[${client.username}]: ${receivedMessage.content}`);
       this.broadcastMessage(textMessage, client.socket);
     } catch (err) {
       console.error("Error decoding message: ", err);
@@ -61,15 +65,14 @@ class WebSocketServer {
   }
 
   handleClientClosure(client) {
-    this.clients.delete(client.clientId);
-    console.log(`Closing connection for client ${client.clientId}`);
+    this.clients.delete(client.Id);
+    console.log(`Closing connection for client ${client.Id}`);
+    this.printConnectedClients();
   }
 
   logClientInfo(client) {
-    const { clientId, connectionTime, userAgent, clientIPAddress } = client;
-    console.log(
-      `${clientId}\n${connectionTime}\n${userAgent}\n${clientIPAddress}`
-    );
+    const { Id, connectionTime, userAgent, IpAddress } = client;
+    console.log(`${Id}\n${connectionTime}\n${userAgent}\n${IpAddress}`);
   }
 
   decodeMessage(blobMessage) {

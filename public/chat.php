@@ -3,6 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <title>WebSocket Chat</title>
+    <script src="/src/processData/messageHandler.js"></script>
     <link rel="shortcut icon" href="#" />
   </head>
   <body>
@@ -15,6 +16,5 @@
     />
     <button onclick="sendMessage()">Send</button>
     <ul id="chat"></ul>
-    <script src="/src/processData/messageHandler.js"></script>
   </body>
 </html>

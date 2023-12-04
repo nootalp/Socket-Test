@@ -6,6 +6,7 @@
   "scripts": {
     "start": "nodemon ./src/Server.js"
   },
+  "type": "commonjs",
   "author": "",
   "license": "ISC",
   "dependencies": {

@@ -53,15 +53,14 @@ class WebSocketServer {
   }
 
   processReceivedMessage(client, message) {
-    try {
-      const textMessage = this.decodeMessage(message);
-      const receivedMessage = new Message(client.Id, textMessage).messageData;
+    const textMessage = this.decodeMessage(message);
+    this.logReceivedMessage(client, textMessage);
+    this.broadcastMessage(textMessage, client.socket);
+  }
 
-      console.log(`[${client.username}]: ${receivedMessage.content}`);
-      this.broadcastMessage(textMessage, client.socket);
-    } catch (err) {
-      console.error("Error decoding message: ", err);
-    }
+  logReceivedMessage(client, textMessage) {
+    const receivedMessage = new Message(client.Id, textMessage).messageData;
+    console.log(`[${client.username}]: ${receivedMessage.content}`);
   }
 
   handleClientClosure(client) {

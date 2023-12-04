@@ -1,42 +1,55 @@
-const socket = new WebSocket(`ws://localhost:3000`);
+const socket = new WebSocket("ws://localhost:3000");
 
-socket.onmessage = function (event) {
+function addToChat(message) {
+  const chatElement = document.getElementById("chat");
+  const messageElement = document.createElement("li");
+  messageElement.textContent = message;
+  chatElement.appendChild(messageElement);
+}
+
+function handleReceivedMessage(event) {
   try {
     const receivedMessage = JSON.parse(event.data);
     console.log(receivedMessage);
+    if (receivedMessage.connection !== "ok") {
+      addToChat(receivedMessage);
+    }
   } catch (error) {
-    console.log("Received non-JSON message:", event.data);
+    console.error("Error to process JSON:", error);
+    addToChat("Error to process message.");
   }
-};
+}
 
-socket.addEventListener("message", (event) => {
-  const chat = document.getElementById("chat");
-  if (event.data === JSON.stringify({ connection: "ok" })) return;
-  else chat.innerHTML += `<li>${event.data}</li>`;
-});
+function sendMessageToServer(messageText) {
+  if (!messageText.trim()) return;
 
-socket.addEventListener("close", (event) => {
-  if (event.wasClean) {
-    console.log("Connection closed sucessfully.");
+  addToChat(`You: ${messageText}`);
+  if (socket.readyState === WebSocket.OPEN) {
+    socket.send(messageText);
+  } else {
+    addToChat("Error: Connection is not open.");
   }
-});
-
-function sendMessage() {
-  const input = document.getElementById("message");
-  const messageText = input.value.trim();
-
-  if (!messageText) return;
-
-  const chat = document.getElementById("chat");
-  chat.innerHTML += `<li>You: ${messageText}</li>`;
-
-  socket.send(messageText);
-  input.value = "";
-  input.focus();
 }
 
 function handleKeyPress(event) {
   if (event.key === "Enter") {
-    sendMessage();
+    const inputMessage = document.getElementById("message").value.trim();
+    sendMessageToServer(inputMessage);
+    document.getElementById("message").value = "";
+    document.getElementById("message").focus();
   }
 }
+
+socket.addEventListener("open", () => {
+  console.log("Opened connnection.");
+});
+
+socket.addEventListener("message", handleReceivedMessage);
+
+socket.addEventListener("close", (event) => {
+  if (event.wasClean) {
+    console.log("Connection closed successfully.");
+  } else {
+    console.log("The connection was closed unexpectedly.");
+  }
+});

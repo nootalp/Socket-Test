@@ -55,7 +55,8 @@ class WebSocketServer {
   processReceivedMessage(client, message) {
     const textMessage = this.decodeMessage(message);
     this.logReceivedMessage(client, textMessage);
-    this.broadcastMessage(textMessage, client.socket);
+    const messageWithSender = `[${client.username}]: ${textMessage}`;
+    this.broadcastMessage(messageWithSender, client.socket);
   }
 
   logReceivedMessage(client, textMessage) {
@@ -84,7 +85,7 @@ class WebSocketServer {
 
     for (const client of this.clients.values()) {
       if (canReceiveMessage(client)) {
-        client.socket.send(message);
+        client.socket.send(JSON.stringify({ content: message }));
       }
     }
   }

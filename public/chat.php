@@ -12,9 +12,8 @@
       type="text"
       id="message"
       placeholder="Enter your message"
-      onkeydown="handleKeyPress(event)"
     />
-    <button onclick="sendMessage()">Send</button>
+    <button>Send</button>
     <ul id="chat"></ul>
   </body>
 </html>

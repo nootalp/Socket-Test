@@ -30,10 +30,6 @@ class Routes {
   returnUsername() {
     return usernameFromRequest;
   }
-
-  returnRoutes() {
-    return this.appRoutes;
-  }
 }
 
 module.exports = Routes;

@@ -12,7 +12,7 @@ class ExpressServer {
     this.port = port;
     this.mainApp = express();
     this.server = http.createServer(this.mainApp);
-    this.websocketServer = new WebSocketServer(this.server);
+    this.webSocketServer = new WebSocketServer(this.server);
 
     this.expressConfig();
     this.setupRoutes(routes);

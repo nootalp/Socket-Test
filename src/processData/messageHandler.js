@@ -1,4 +1,4 @@
-class ChatClient {
+class ClientChatHandler {
   constructor(url) {
     this.socket = new WebSocket(url);
     document.addEventListener("DOMContentLoaded", () => {
@@ -12,6 +12,7 @@ class ChatClient {
     this.socket.addEventListener("message", (event) => this.onMessage(event));
     this.socket.addEventListener("close", (event) => this.onClose(event));
   }
+
   inputListeners() {
     document
       .getElementById("message")
@@ -82,4 +83,4 @@ class ChatClient {
   }
 }
 
-new ChatClient("ws://localhost:3000");
+new ClientChatHandler("ws://localhost:3000");

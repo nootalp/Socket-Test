@@ -21,13 +21,22 @@ class Routes {
 
       .post("/processUsername", (req, res) => {
         usernameFromRequest = req.body.username;
+        res.cookie("usernameCookie", usernameFromRequest, {
+          maxAge: 900000,
+          httpOnly: true,
+          secure: true,
+          sameSite: "lax",
+        });
         res.redirect(
           `/public/chat.php?username=${encodeURIComponent(usernameFromRequest)}`
         );
       });
   }
 
-  returnUsername() {
+  returnUsername(req) {
+    if (usernameFromRequest === "Default") {
+      return req.cookies.usernameCookie;
+    }
     return usernameFromRequest;
   }
 }

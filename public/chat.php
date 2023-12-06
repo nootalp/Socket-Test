@@ -1,3 +1,10 @@
+<?php
+  if (!isset($_COOKIE['usernameCookie'])) {
+    header("Location: /");
+    exit; 
+  }
+?>
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -7,7 +14,7 @@
     <link rel="shortcut icon" href="#" />
   </head>
   <body>
-  <h1>Welcome to the chat, <?php echo $_GET['username']; ?>!</h1>
+  <h1>Welcome to the chat, <?php echo $_COOKIE['usernameCookie']; ?>!</h1>
     <input
       type="text"
       id="message"

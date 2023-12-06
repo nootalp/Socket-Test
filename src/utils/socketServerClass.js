@@ -13,13 +13,13 @@ class WebSocketServer {
     /**
      * Map of connected clients.
      * @type {Map<string, Client>} ? Key is the client ID and the value is the client object. */
-    this.clients = new Map();
+    this.__clients = new Map();
 
     /**
      * Ensures that the event callback references the scope of the class with 'bind()'.
      * @event WebSocketServer#connection
-     * @param {WebSocket} ws - WebSocket Object for client connections.
-     * @param {http.IncomingMessage} req - Object to received messages. */
+     * @param {WebSocket} ws ? WebSocket Object for client connections.
+     * @param {http.IncomingMessage} req ? Object to received messages. */
     this.wss.on("connection", this.handleWebSocketConnection.bind(this));
   }
 
@@ -32,9 +32,10 @@ class WebSocketServer {
     if (this.registerClient(newClient)) {
       this.sendConnectionMessage(newClient);
       this.logConnectedClients();
+
+      ws.on("message", this.processReceivedMessage.bind(this, newClient));
+      ws.on("close", this.handleClientClosure.bind(this, newClient));
     }
-    ws.on("message", this.processReceivedMessage.bind(this, newClient));
-    ws.on("close", this.handleClientClosure.bind(this, newClient));
   }
 
   logConnectedClients() {
@@ -42,17 +43,17 @@ class WebSocketServer {
     console.log("      Connected Clients       ");
     console.log("------------------------------");
 
-    const connectedClients = Array.from(this.clients.keys());
-    const totalClients = connectedClients.length;
+    const totalClients = this.__clients.size;
 
     if (totalClients === 0) {
       console.log("No clients connected.");
     } else {
       console.log(`Total connected clients: ${totalClients}`);
       console.log("Client IDs:");
-      connectedClients.forEach((clientId, index) => {
-        console.log(`  ${index + 1}. ${clientId}`);
-      });
+      let index = 1;
+      for (const [clientId, client] of this.__clients.entries()) {
+        console.log(`  ${index++}. ${clientId} (${client.username})`);
+      }
     }
 
     console.log("------------------------------");
@@ -60,20 +61,21 @@ class WebSocketServer {
 
   /**
    * Creates and returns the attributes of a new customer based on the given parameters.
-   * @param {WebSocket} ws - WebSocket object for the client connection.
-   * @param {http.IncomingMessage} req - Received message object.
-   * @returns {Client} - Returns an object representing the attributes of the new client. */
+   * @param {WebSocket} ws ? WebSocket object for the client connection.
+   * @param {http.IncomingMessage} req ? Received message object.
+   * @returns {Client} ? Returns an object representing the attributes of the new client. */
   createClientAttributes(ws, req) {
-    return new Client(ws, req.headers["user-agent"], req.socket.remoteAddress);
+    const { headers, socket } = req;
+    return new Client(ws, headers["user-agent"], socket.remoteAddress);
   }
 
   /**
    * Registers a new connected client.
-   * @param {Client} client - Client object to be registered.
-   * @returns {boolean} - Returns true if the client was registered successfully; otherwise, false. */
+   * @param {Client} client ? Client object to be registered.
+   * @returns {boolean} ? Returns true if the client was registered successfully; otherwise, false. */
   registerClient(client) {
     try {
-      this.clients.set(client.Id, client);
+      this.__clients.set(client.Id, client);
       this.logClientInfo(client);
       return true;
     } catch (err) {
@@ -93,8 +95,8 @@ class WebSocketServer {
   /**
    * Processes the message received from a client.
    * Decodes the message, logs it to the console and sends the message to all connected clients.
-   * @param {Client} client - Object representing the client that sent the message.
-   * @param {Buffer} message - Message received from the client (in buffer format). */
+   * @param {Client} client ? Object representing the client that sent the message.
+   * @param {Buffer} message ? Message received from the client (in buffer format). */
   processReceivedMessage(client, message) {
     const textMessage = this.decodeMessage(message);
     this.logReceivedMessage(client, textMessage);
@@ -105,8 +107,8 @@ class WebSocketServer {
   /**
    * Records the message received from a client in the console.
    * Creates a message object using the client ID and message content, and logs it to the console.
-   * @param {Client} client - Object representing the client that sent the message.
-   * @param {string} textMessage - The text of the received message. */
+   * @param {Client} client ? Object representing the client that sent the message.
+   * @param {string} textMessage ? The text of the received message. */
   logReceivedMessage(client, textMessage) {
     const receivedMessage = new Message(client.Id, textMessage).messageData;
     console.log(`[${client.username}]: ${receivedMessage.content}`);
@@ -115,9 +117,9 @@ class WebSocketServer {
   /**
    * Handles the closing of a client connection.
    * Removes the client from the list of connected clients and records the connection closure in the console.
-   * @param {Client} client - Object representing the client whose connection is being closed. */
+   * @param {Client} client ? Object representing the client whose connection is being closed. */
   handleClientClosure(client) {
-    this.clients.delete(client.Id);
+    this.__clients.delete(client.Id);
     console.log(`Closing connection for client ${client.Id}`);
     this.logConnectedClients();
   }
@@ -129,21 +131,21 @@ class WebSocketServer {
 
   /**
    * Decodes a message received from the client.
-   * @param {Buffer} blobMessage - Encoded message received from the client.
-   * @returns {string} - Returns the decoded message. */
+   * @param {Buffer} blobMessage ? Encoded message received from the client.
+   * @returns {string} ? Returns the decoded message. */
   decodeMessage(blobMessage) {
     return Buffer.from(blobMessage).toString("utf-8");
   }
 
   /**
    * Sends a message to all connected clients except the sender.
-   * @param {string} message - The message to be transmitted to clients.
-   * @param {WebSocket} sender - The WebSocket of the message sender. */
-  broadcastMessage(message, sender) {
+   * @param {string} message ? The message to be transmitted to clients.
+   * @param {WebSocket} mailer ? The WebSocket of the message sender. */
+  broadcastMessage(message, mailer) {
     const canReceiveMessage = (client) =>
-      client.socket !== sender && client.socket.readyState === WebSocket.OPEN;
+      client.socket !== mailer && client.socket.readyState === WebSocket.OPEN;
 
-    for (const client of this.clients.values()) {
+    for (const client of this.__clients.values()) {
       if (canReceiveMessage(client)) {
         client.socket.send(JSON.stringify({ content: message }));
       }

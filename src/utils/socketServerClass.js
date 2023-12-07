@@ -35,6 +35,14 @@ class WebSocketServer {
 
       ws.on("message", this.processReceivedMessage.bind(this, newClient));
       ws.on("close", this.handleClientClosure.bind(this, newClient));
+    } else {
+      // Se o nome de usuário já estiver em uso, envie uma mensagem de erro para o cliente
+      ws.send(
+        JSON.stringify({
+          error: "Username already in use. Please choose a different one.",
+        })
+      );
+      ws.close();
     }
   }
 
@@ -75,6 +83,16 @@ class WebSocketServer {
    * @returns {boolean} ? Returns true if the client was registered successfully; otherwise, false. */
   registerClient(client) {
     try {
+      // Verifica se o nome de usuário já está em uso
+      const isUsernameTaken = [...this.__clients.values()].some(
+        (existingClient) => existingClient.username === client.username
+      );
+
+      if (isUsernameTaken) {
+        console.log(`Username ${client.username} is already in use.`);
+        return false;
+      }
+
       this.__clients.set(client.Id, client);
       this.logClientInfo(client);
       return true;

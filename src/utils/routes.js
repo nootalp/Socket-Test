@@ -27,9 +27,8 @@ class Routes {
           secure: true,
           sameSite: "lax",
         });
-        res.redirect(
-          `/public/chat.php?username=${encodeURIComponent(usernameFromRequest)}`
-        );
+
+        res.redirect(`/public/chat.php`);
       });
   }
 

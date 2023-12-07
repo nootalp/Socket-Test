@@ -53,6 +53,12 @@ class ClientChatHandler {
       return;
     }
 
+    if (receivedMessage.error) {
+      console.error("Server Error:", receivedMessage.error);
+      this.addToChat(`Error: ${receivedMessage.error}`);
+      return;
+    }
+
     throw new Error("Unexpected message format.");
   }
 

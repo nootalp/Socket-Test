@@ -1,13 +1,16 @@
 const express = require("express");
 const path = require("path");
 const { __projectDirectory } = require("./configServer");
+const WebSocket = require("ws");
 
 let usernameFromRequest = null;
 
 class Routes {
-  constructor() {
+  constructor(ws = null) {
     this.appRoutes = express.Router();
     this.projectDirectory = __projectDirectory;
+    this.ws = ws;
+    if (this.ws) this.socketListenCommunicate();
     this.setupRoutes();
   }
 
@@ -30,6 +33,15 @@ class Routes {
 
         res.redirect(`/public/chat.php`);
       });
+  }
+
+  socketListenCommunicate() {
+    this.ws.onopen = () => {
+      const data = {
+        type: "RoutesConnection",
+      };
+      this.ws.send(JSON.stringify(data));
+    };
   }
 
   returnUsername(req) {

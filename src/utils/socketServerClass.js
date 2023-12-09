@@ -3,23 +3,16 @@ const { Client, Message } = require("../models/objectModels");
 
 class WebSocketServer {
   constructor(server) {
-    this.wss = new WebSocket.Server({ server });
+    if (server) this.wss = new WebSocket.Server({ server });
     this.__clients = new Map();
     this.wss.on("connection", this.handleWebSocketConnection.bind(this));
   }
 
   handleWebSocketConnection(ws, req) {
-    ws.on("message", (message) => {
-      const data = JSON.parse(message);
-      if (data.type !== "RoutesConnection") {
-        const newClient = this.createClientAttributes(ws, req).messageData;
-        this.registerClient(newClient)
-          ? this.handleRegisteredClient(ws, newClient)
-          : this.handleUnregisteredClient(ws);
-      } else {
-        console.log("RoutesConnection received. Ignoring client creation.");
-      }
-    });
+    const newClient = this.createClientAttributes(ws, req).messageData;
+    this.registerClient(newClient)
+      ? this.handleRegisteredClient(ws, newClient)
+      : this.handleUnregisteredClient(ws);
   }
 
   handleRegisteredClient(ws, newClient) {
@@ -64,18 +57,18 @@ class WebSocketServer {
 
   registerClient(client) {
     try {
-      const isUsernameTaken = [...this.__clients.values()].some(
+      const isUsernameRegistered = [...this.__clients.values()].some(
         (existingClient) => existingClient.username === client.username
       );
 
-      if (isUsernameTaken) {
+      if (isUsernameRegistered) {
         console.log(`Username ${client.username} is already in use.`);
         return false;
+      } else {
+        this.__clients.set(client.Id, client);
+        this.consoleClientInfo(client);
+        return true;
       }
-
-      this.__clients.set(client.Id, client);
-      this.consoleClientInfo(client);
-      return true;
     } catch (err) {
       console.error("Error adding client: ", err);
       return false;
@@ -83,13 +76,16 @@ class WebSocketServer {
   }
 
   sendConnectionMessage(client) {
-    const message = `new Client Connected! [${client.username}]`;
+    const message = `new Client Connected! :: [${client.username}]`;
     this.broadcastMessage(message, client.socket);
   }
 
   processReceivedMessage(client, message) {
+    if (client.username === "Default") return;
+
     const textMessage = this.decodeMessage(message);
     this.logReceivedMessage(client, textMessage);
+
     const messageWithSender = `[${client.username}]: ${textMessage}`;
     this.broadcastMessage(messageWithSender, client.socket);
   }

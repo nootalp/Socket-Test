@@ -33,22 +33,13 @@ class ClientChatHandler {
    * Handles the WebSocket message received event.
    * @param {MessageEvent} event ? Received message event. */
   onMessage(event) {
-    try {
-      const receivedMessage = JSON.parse(event.data);
-      this.handleReceivedMessage(receivedMessage);
-    } catch (error) {
-      console.error("Error handling message:", error);
-      this.addToChat("Error: Failed to process message.");
-    }
+    const receivedMessage = JSON.parse(event.data);
+    this.handleReceivedMessage(receivedMessage);
   }
 
   handleReceivedMessage(receivedMessage) {
-    if (receivedMessage.connection === "ok") {
-      console.log("Connection message received.");
-      return;
-    }
-
     if (receivedMessage.content) {
+      console.log("a");
       this.addToChat(receivedMessage.content);
       return;
     }

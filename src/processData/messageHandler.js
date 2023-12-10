@@ -1,11 +1,5 @@
 class ClientChatHandler {
-  /**
-   * @constructor
-   * @param {string} url ? WebSocket URL. */
   constructor(url) {
-    /**
-     * WebSocket object for communication with the server.
-     * @type {WebSocket} */
     this.socket = new WebSocket(url);
     document.addEventListener("DOMContentLoaded", () => {
       this.initializeSocket();
@@ -29,9 +23,6 @@ class ClientChatHandler {
     console.log("Opened connection.");
   }
 
-  /**
-   * Handles the WebSocket message received event.
-   * @param {MessageEvent} event ? Received message event. */
   onMessage(event) {
     const receivedMessage = JSON.parse(event.data);
     this.handleReceivedMessage(receivedMessage);
@@ -39,7 +30,6 @@ class ClientChatHandler {
 
   handleReceivedMessage(receivedMessage) {
     if (receivedMessage.content) {
-      console.log("a");
       this.addToChat(receivedMessage.content);
       return;
     }
@@ -68,9 +58,6 @@ class ClientChatHandler {
     chatElement.appendChild(messageElement);
   }
 
-  /**
-   * Sends a message to the server.
-   * @param {string} messageText ? Text of the message to be sent. */
   sendMessage(messageText) {
     if (!messageText.trim()) return;
 
@@ -82,9 +69,6 @@ class ClientChatHandler {
     }
   }
 
-  /**
-   * Handles the key press event to send a message.
-   * @param {KeyboardEvent} event ? Key pressed event. */
   handleKeyPress(event) {
     if (event.key === "Enter") {
       const inputMessage = document.getElementById("message").value.trim();

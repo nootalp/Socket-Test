@@ -1,18 +1,22 @@
 const express = require("express");
 const http = require("http");
-const WebSocketServer = require("./socketServerClass");
+const SocketServer = require("./socketServerClass");
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 const path = require("path");
 const { createProxyMiddleware } = require("http-proxy-middleware");
 const { httpURI, __projectDirectory } = require("./configServer");
+const ClientFactory = require("./clientFactoryClass");
 
 class ExpressServer {
   constructor(port, routes) {
     this.port = port;
     this.mainApp = express();
-    this.server = http.createServer(this.mainApp);
-    this.webSocketServer = new WebSocketServer(this.server);
+    this.httpServer = http.createServer(this.mainApp);
+    this.webSocketServer = new SocketServer(
+      this.httpServer,
+      new ClientFactory()
+    );
 
     this.expressConfig();
     this.setupRoutes(routes);
@@ -52,7 +56,7 @@ class ExpressServer {
   }
 
   startServer() {
-    this.server.listen(this.port, () =>
+    this.httpServer.listen(this.port, () =>
       console.log(`Server running on ${httpURI}`)
     );
   }

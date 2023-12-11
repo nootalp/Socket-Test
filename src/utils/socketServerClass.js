@@ -5,7 +5,7 @@ const ClientFactory = require("./clientFactoryClass");
 class SocketServer {
   constructor(httpServer) {
     this.clientFactory = new ClientFactory();
-    this.clientManager = new ClientManager(this.clientFactory);
+    this.clientManager = new ClientManager();
     if (httpServer) {
       this.wss = new WebSocket.Server({ server: httpServer });
       this.wss.on("connection", this.handleWebSocketConnection.bind(this));
@@ -14,7 +14,7 @@ class SocketServer {
 
   handleWebSocketConnection(ws, req) {
     const clientData = this.clientFactory.pullClientData(ws, req);
-    this.clientFactory.wasNotRecorded(clientData)
+    this.clientManager.wasNotRecorded(clientData)
       ? this.handleClientConnection(ws, clientData)
       : this.blockClientDataReceipt(ws);
   }
@@ -23,7 +23,7 @@ class SocketServer {
     const { clientManager } = this;
     clientManager
       .newConnectionMessage(clientData)
-      .clientJoho(clientData)
+      .clientRogu.clientJoho(clientData)
       .connectedClients();
 
     ws.on(
@@ -38,9 +38,9 @@ class SocketServer {
   }
 
   handleClientClosure(client) {
-    this.clientFactory.clients.delete(client.Id);
+    this.clientManager.clients.delete(client.Id);
     console.log(`Closing connection for client ${client.Id}`);
-    this.clientManager.connectedClients();
+    this.clientManager.clientRogu.connectedClients();
   }
 }
 

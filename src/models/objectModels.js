@@ -7,7 +7,7 @@ class Client {
       socket,
       userAgent,
       IpAddress,
-      connectionTime: new Date(),
+      connectionData: new Date(),
       Id: Client.generateClientId(),
       username: new Routes().returnUsername() || "Default",
     };

@@ -7,16 +7,14 @@ const path = require("path");
 const { createProxyMiddleware } = require("http-proxy-middleware");
 const { httpURI, __projectDirectory } = require("./configServer");
 const ClientFactory = require("./clientFactoryClass");
+const ClientManager = require("./clientManagerClass");
 
 class ExpressServer {
   constructor(port, routes) {
     this.port = port;
     this.mainApp = express();
     this.httpServer = http.createServer(this.mainApp);
-    this.webSocketServer = new SocketServer(
-      this.httpServer,
-      new ClientFactory()
-    );
+    this.socketServer = new SocketServer(this.httpServer);
 
     this.expressConfig();
     this.setupRoutes(routes);

@@ -10,7 +10,7 @@
   <head>
     <meta charset="UTF-8" />
     <title>WebSocket Chat</title>
-    <script src="/src/processData/messageHandler.js"></script>
+    <script src="/src/processData/chatHandlerClass.js"></script>
     <link rel="shortcut icon" href="#" />
   </head>
   <body>

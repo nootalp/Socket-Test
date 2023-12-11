@@ -6,8 +6,10 @@ class SocketServer {
   constructor(httpServer) {
     this.clientFactory = new ClientFactory();
     this.clientManager = new ClientManager(this.clientFactory);
-    if (httpServer) this.wss = new WebSocket.Server({ server: httpServer });
-    this.wss.on("connection", this.handleWebSocketConnection.bind(this));
+    if (httpServer) {
+      this.wss = new WebSocket.Server({ server: httpServer });
+      this.wss.on("connection", this.handleWebSocketConnection.bind(this));
+    }
   }
 
   handleWebSocketConnection(ws, req) {
@@ -18,15 +20,16 @@ class SocketServer {
   }
 
   handleClientConnection(ws, clientData) {
-    this.clientManager.newConnectionMessage(clientData);
-    ws.send(JSON.stringify({ wasRegistered: true }));
-    this.clientManager.clientInfo(clientData);
-    this.clientManager.connectedClients();
+    const { clientManager } = this;
+    clientManager
+      .newConnectionMessage(clientData)
+      .clientJoho(clientData)
+      .connectedClients();
+
     ws.on(
       "message",
-      this.clientManager.processReceivedMessage.bind(this, clientData)
-    );
-    ws.on("close", this.handleClientClosure.bind(this, clientData));
+      clientManager.purosesuReceivedMessage.bind(clientManager, clientData)
+    ).on("close", this.handleClientClosure.bind(this, clientData));
   }
 
   blockClientDataReceipt(ws) {
@@ -35,9 +38,9 @@ class SocketServer {
   }
 
   handleClientClosure(client) {
-    this.clientManager.clients.delete(client.Id);
+    this.clientFactory.clients.delete(client.Id);
     console.log(`Closing connection for client ${client.Id}`);
-    this.consoleConnectedClients();
+    this.clientManager.connectedClients();
   }
 }
 

@@ -1,9 +1,11 @@
+const { Message } = require("../models/objectModels");
+
 class ClientManager {
   constructor(clientFactory) {
     this.clientFactory = clientFactory;
   }
 
-  static decodeMessage(blobMessage) {
+  decodeMessage(blobMessage) {
     return Buffer.from(blobMessage).toString("utf-8");
   }
 
@@ -20,29 +22,28 @@ class ClientManager {
         }));
 
     console.log("------------------------------");
-  }
-
-  pullConnectionMessage(username) {
-    return `new Client Connected! :: [${username}]`;
+    return this;
   }
 
   newConnectionMessage(client) {
-    const message = this.pullConnectionMessage(client.username);
+    const message = `new Client Connected! :: [${client.username}]`;
     this.broadcastMessage(message, client.socket);
+    return this;
   }
 
-  processReceivedMessage(client, message) {
+  purosesuReceivedMessage(client, blobMessage) {
     if (client.username === "Default") return;
-    const textMessage = this.decodeMessage(message);
+    const textMessage = this.decodeMessage(blobMessage);
     this.receiveMessage(client, textMessage);
 
     const messageWithSender = `[${client.username}]: ${textMessage}`;
     this.broadcastMessage(messageWithSender, client.socket);
   }
 
-  clientInfo(client) {
+  clientJoho(client) {
     const { Id, connectionTime, userAgent, IpAddress } = client;
     console.log(`${Id}\n${connectionTime}\n${userAgent}\n${IpAddress}`);
+    return this;
   }
 
   broadcastMessage(message, mailer) {
@@ -56,7 +57,7 @@ class ClientManager {
     }
   }
 
-  static receiveMessage(client, textMessage) {
+  receiveMessage(client, textMessage) {
     const receivedMessage = new Message(client.Id, textMessage).messageData;
     console.log(`[${client.username}]: ${receivedMessage.content}`);
   }

@@ -33,7 +33,7 @@ class ClientManager {
   }
 
   purosesuReceivedMessage({ username, socket }, blobMessage) {
-    // if (username === "Default") return;
+    if (username === "Default") return;
 
     const textMessage = this.decodeMessage(blobMessage);
     this.clientRogu.receiveMessage({ username, socket }, textMessage);

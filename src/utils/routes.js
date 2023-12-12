@@ -21,23 +21,22 @@ class Routes {
         )
       )
 
-      .post("/processUsername", (req, res) => {
-        const { body, cookies } = req;
+      .post("/processUsername", ({ body, cookies }, res) => {
         usernameFromRequest = body.username;
 
         const promptUsername = JSON.stringify({
-          isUsernameRegistered: req.body.username || cookies.usernameCookie,
+          usernameRegistered: body.username || cookies.usernameCookie,
         });
         this.ws.send(promptUsername);
 
-        res.cookie("usernameCookie", usernameFromRequest, {
-          maxAge: 900000,
-          httpOnly: true,
-          secure: true,
-          sameSite: "lax",
-        });
-
-        res.redirect(`/public/chat.php`);
+        res
+          .cookie("usernameCookie", usernameFromRequest, {
+            maxAge: 900000,
+            httpOnly: true,
+            secure: true,
+            sameSite: "lax",
+          })
+          .redirect(`/public/chat.php`);
       });
   }
 

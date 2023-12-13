@@ -2,13 +2,13 @@ const { v4: uuidv4 } = require("uuid");
 const Routes = require("../utils/routes");
 
 class Client {
-  constructor(socket, userAgent, IpAddress) {
+  constructor(socket, userAgent, ipAddress) {
     this.messageData = {
       socket,
       userAgent,
-      IpAddress,
+      ipAddress,
       connectionData: new Date(),
-      Id: Client.generateClientId(),
+      id: Client.generateClientId(),
       username: new Routes().returnUsername() || "Default",
     };
   }

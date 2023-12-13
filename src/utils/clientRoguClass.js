@@ -5,13 +5,13 @@ class ClientRogu {
     this.clientManager = clientManager;
   }
 
-  receiveMessage({ username, Id }, textMessage) {
-    const receivedMessage = new Message(Id, textMessage).messageData;
+  receiveMessage({ username, id }, textMessage) {
+    const receivedMessage = new Message(id, textMessage).messageData;
     console.log(`[${username}]: ${receivedMessage.content}`);
   }
 
-  clientJoho({ Id, connectionData, userAgent, IpAddress }) {
-    console.log(`${Id}\n${connectionData}\n${userAgent}\n${IpAddress}`);
+  clientJoho({ id, connectionData, userAgent, ipAddress }) {
+    console.log(`${id}\n${connectionData}\n${userAgent}\n${ipAddress}`);
     return this;
   }
 

@@ -14,6 +14,7 @@ class SocketServer {
 
   handleWebSocketConnection(ws, req) {
     const clientData = this.clientFactory.pullClientData(ws, req);
+
     this.clientManager.wasNotRecorded(clientData)
       ? this.handleClientConnection(ws, clientData)
       : this.blockClientDataReceipt(ws);
@@ -37,9 +38,9 @@ class SocketServer {
     ws.close();
   }
 
-  handleClientClosure(client) {
-    this.clientManager.clients.delete(client.Id);
-    console.log(`Closing connection for client ${client.Id}`);
+  handleClientClosure({ id }) {
+    this.clientManager.clients.delete(id);
+    console.log(`Closing connection for ID [${id}]  ...`);
     this.clientManager.clientRogu.connectedClients();
   }
 }

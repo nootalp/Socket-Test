@@ -1,29 +1,14 @@
 const ClientRogu = require("./clientRoguClass");
+const ConnectionMap = require("./connectionMapClass");
 
-class ClientManager {
+class ClientManager extends ConnectionMap {
   constructor() {
+    super();
     this.clientRogu = new ClientRogu(this);
-    this.clients = new Map();
   }
 
   decodeMessage(blobMessage) {
     return Buffer.from(blobMessage).toString("utf-8");
-  }
-
-  isUsernameRegistered(username) {
-    return [...this.clients.values()].some(
-      (existingClient) => existingClient.username === username
-    );
-  }
-
-  wasNotRecorded({ username, Id }) {
-    const isRegistered = this.isUsernameRegistered(username);
-    if (isRegistered) {
-      console.log(`Username ${username} is already in use.`);
-      return false;
-    }
-    this.clients.set(Id, arguments[0]);
-    return true;
   }
 
   newConnectionMessage({ username, socket }) {

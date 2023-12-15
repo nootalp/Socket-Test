@@ -79,4 +79,12 @@ class ChatHandlerClass {
   }
 }
 
-new ChatHandlerClass(`ws://localhost:3000`);
+fetch("/ws-url")
+  .then((response) => response.json())
+  .then((data) => {
+    const { webSocketURL } = data;
+    new ChatHandlerClass(webSocketURL);
+  })
+  .catch((error) => {
+    console.error("Erro ao obter a URL do WebSocket:", error);
+  });

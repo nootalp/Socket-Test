@@ -1,6 +1,6 @@
 const express = require("express");
 const path = require("path");
-const { __projectDirectory } = require("./configServer");
+const { __projectDirectory, webSocketURL } = require("./configServer");
 
 let usernameFromRequest = null;
 
@@ -20,7 +20,9 @@ class Routes {
           path.join(this.projectDirectory, "public", "usernameSetup.html")
         )
       )
-
+      .get("/ws-url", (_, res) => {
+        res.json({ webSocketURL });
+      })
       .post("/processUsername", ({ body, cookies }, res) => {
         usernameFromRequest = body.username;
 

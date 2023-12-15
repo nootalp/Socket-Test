@@ -1,15 +1,16 @@
 const ExpressServer = require("./utils/expressServerClass.js");
 const {
   httpPort,
-  phpProxyURL,
   webSocketURL,
+  phpProxyURL,
 } = require("./utils/configServer.js");
 const Routes = require("./utils/routes.js");
 const WebSocket = require("ws");
 const { exec } = require("child_process");
+const { hostname, port } = new URL(phpProxyURL);
 
 /** Setup local php server. */
-exec(`php -S ${phpProxyURL} -t public`);
+exec(`php -S ${hostname}:${port} -t public`);
 const ws = new WebSocket(`${webSocketURL}`);
 
 new ExpressServer(httpPort, new Routes(ws).appRoutes);

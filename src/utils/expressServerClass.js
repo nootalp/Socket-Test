@@ -26,11 +26,8 @@ class ExpressServer {
       .use(
         "/public/chat.php",
         createProxyMiddleware({
-          target: "http://localhost:8000",
+          target: "http://localhost:8000/chat.php",
           changeOrigin: true,
-          pathRewrite: {
-            "^/public/chat.php": "chat.php",
-          },
         })
       )
       .use(

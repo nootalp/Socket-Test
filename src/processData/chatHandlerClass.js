@@ -79,4 +79,4 @@ class ChatHandlerClass {
   }
 }
 
-new ChatHandlerClass("ws://localhost:3000");
+new ChatHandlerClass(`ws://localhost:3000`);

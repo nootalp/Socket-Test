@@ -5,7 +5,7 @@ const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 const path = require("path");
 const { createProxyMiddleware } = require("http-proxy-middleware");
-const { httpURI, __projectDirectory } = require("./configServer");
+const { httpURL, __projectDirectory, phpProxyURL } = require("./configServer");
 
 class ExpressServer {
   constructor(port, routes) {
@@ -26,7 +26,7 @@ class ExpressServer {
       .use(
         "/public/chat.php",
         createProxyMiddleware({
-          target: "http://localhost:8000/chat.php",
+          target: `${phpProxyURL}/chat.php`,
           changeOrigin: true,
         })
       )
@@ -50,7 +50,7 @@ class ExpressServer {
 
   startServer() {
     this.httpServer.listen(this.port, () =>
-      console.log(`Server running on ${httpURI}`)
+      console.log(`Server running on ${httpURL}`)
     );
   }
 }

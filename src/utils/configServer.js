@@ -1,12 +1,9 @@
-const __projectDirectory = process.cwd();
+httpPort = 3000;
 
 module.exports = {
-  __projectDirectory,
-  httpPort: 3000 || process.env.PORT,
-  get webSocketURI() {
-    return `ws://localhost:${this.httpPort}/`;
-  },
-  get httpURI() {
-    return `http://localhost:${this.httpPort}/`;
-  },
+  httpPort,
+  __projectDirectory: process.cwd(),
+  phpProxyURL: `http://localhost:8000`,
+  webSocketURL: `ws://localhost:${httpPort}`,
+  httpURL: `http://localhost:${httpPort}`,
 };

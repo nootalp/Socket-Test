@@ -23,23 +23,30 @@ class Routes {
       .get("/ws-url", (_, res) => {
         res.json({ webSocketURL });
       })
-      .post("/processUsername", ({ body, cookies }, res) => {
-        usernameFromRequest = body.username;
+      .post("/processUsername", this.handleProcessUsername.bind(this));
+  }
 
-        const promptUsername = JSON.stringify({
-          usernameRegistered: body.username || cookies.usernameCookie,
-        });
-        this.ws.send(promptUsername);
+  handleProcessUsername({ body, cookies }, res) {
+    usernameFromRequest = body.username || cookies.usernameCookie;
 
-        res
-          .cookie("usernameCookie", usernameFromRequest, {
-            maxAge: 900000,
-            httpOnly: true,
-            secure: true,
-            sameSite: "lax",
-          })
-          .redirect(`/public/chat.php`);
-      });
+    this.sendMessageToWebSocket(usernameFromRequest);
+
+    res
+      .cookie("usernameCookie", usernameFromRequest, {
+        maxAge: 900000,
+        httpOnly: true,
+        secure: true,
+        sameSite: "lax",
+      })
+      .redirect(`/public/chat.php`);
+  }
+
+  sendMessageToWebSocket(username) {
+    const { ws } = this;
+    const message = JSON.stringify({ usernameRegistered: username });
+    if (ws && ws.readyState === ws.OPEN) {
+      ws.send(message);
+    }
   }
 
   socketListenToCommunicate() {

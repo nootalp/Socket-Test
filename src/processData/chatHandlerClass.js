@@ -1,10 +1,8 @@
 class ChatHandlerClass {
   constructor(url) {
     this.socket = new WebSocket(url);
-    document.addEventListener("DOMContentLoaded", () => {
-      this.initializeSocket();
-      this.inputListeners();
-    });
+    this.initializeSocket();
+    this.inputListeners();
   }
 
   initializeSocket() {

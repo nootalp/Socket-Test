@@ -43,20 +43,19 @@ class Routes {
 
   sendMessageToWebSocket(username) {
     const { ws } = this;
+    ws.onopen = () => {
+      const data = {
+        type: "RoutesConnection",
+      };
+      ws.send(JSON.stringify(data));
+    };
     const message = JSON.stringify({ usernameRegistered: username });
     if (ws && ws.readyState === ws.OPEN) {
       ws.send(message);
     }
   }
 
-  socketListenToCommunicate() {
-    this.ws.onopen = () => {
-      const data = {
-        type: "RoutesConnection",
-      };
-      this.ws.send(JSON.stringify(data));
-    };
-  }
+  socketListenToCommunicate() {}
 
   returnUsername(req) {
     if (usernameFromRequest === "Default") {

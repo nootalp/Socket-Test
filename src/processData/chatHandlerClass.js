@@ -6,7 +6,7 @@ class ChatHandlerClass {
   }
 
   initializeSocket() {
-    this.socket.addEventListener("open", () => this.onOpen());
+    this.socket.addEventListener("op en", () => this.onOpen());
     this.socket.addEventListener("message", (event) => this.onMessage(event));
     this.socket.addEventListener("close", (event) => this.onClose(event));
   }

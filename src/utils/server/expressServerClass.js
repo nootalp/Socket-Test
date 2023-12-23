@@ -5,7 +5,7 @@ const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 const path = require("path");
 const { createProxyMiddleware } = require("http-proxy-middleware");
-const { httpURL, __projectDirectory, phpProxyURL } = require("./configServer");
+const { httpURL, __projectDirectory, phpProxyURL } = require("../configServer");
 
 class ExpressServer {
   constructor(port, routes) {

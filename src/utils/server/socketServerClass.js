@@ -1,6 +1,6 @@
 const WebSocket = require("ws");
-const ClientManager = require("./clientManagerClass");
-const ClientFactory = require("./clientFactoryClass");
+const ClientManager = require("../client/clientManagerClass");
+const ClientFactory = require("../client/clientFactoryClass");
 
 class SocketServer {
   constructor(httpServer) {

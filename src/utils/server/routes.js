@@ -1,6 +1,6 @@
 const express = require("express");
 const path = require("path");
-const { __projectDirectory, webSocketURL } = require("./configServer");
+const { __projectDirectory, webSocketURL } = require("../configServer");
 
 let usernameFromRequest = null;
 

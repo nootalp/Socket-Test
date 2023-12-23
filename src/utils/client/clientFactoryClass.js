@@ -1,4 +1,4 @@
-const { Client } = require("../models/objectModels");
+const { Client } = require("../../models/objectModels");
 
 class ClientFactory {
   pullClientData(ws, { headers, socket }) {

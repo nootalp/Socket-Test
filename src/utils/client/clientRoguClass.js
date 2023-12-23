@@ -1,4 +1,4 @@
-const { Message } = require("../models/objectModels");
+const { Message } = require("../../models/objectModels");
 
 class ClientRogu {
   constructor(clientManager) {

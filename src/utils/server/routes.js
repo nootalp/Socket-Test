@@ -1,13 +1,12 @@
 const express = require("express");
 const path = require("path");
-const { __projectDirectory, webSocketURL } = require("../configServer");
+const { webSocketURL } = require("../configServer");
 
 let usernameFromRequest = null;
 
 class Routes {
   constructor(ws) {
     this.appRoutes = express.Router();
-    this.projectDirectory = __projectDirectory;
     this.ws = ws;
     if (this.ws) this.socketListenToCommunicate();
     this.setupRoutes();
@@ -17,7 +16,7 @@ class Routes {
     this.appRoutes
       .get("/", (_, res) =>
         res.sendFile(
-          path.join(this.projectDirectory, "public", "usernameSetup.html")
+          path.join(process.cwd(), "public", "usernameSetup.html")
         )
       )
       .get("/ws-url", (_, res) => {

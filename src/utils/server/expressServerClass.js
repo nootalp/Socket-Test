@@ -5,7 +5,7 @@ const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 const path = require("path");
 const { createProxyMiddleware } = require("http-proxy-middleware");
-const { httpURL, __projectDirectory, phpProxyURL } = require("../configServer");
+const { httpURL, phpProxyURL } = require("../configServer");
 
 class ExpressServer {
   constructor(port, routes) {
@@ -32,13 +32,13 @@ class ExpressServer {
       )
       .use(
         "/public",
-        express.static(path.join(__projectDirectory, "public"), {
+        express.static(path.join(process.cwd(), "public"), {
           "Content-Type": "text/javascript",
         })
       )
       .use(
         "/src/processData",
-        express.static(path.join(__projectDirectory, "src", "processData"), {
+        express.static(path.join(process.cwd(), "src", "processData"), {
           "Content-Type": "text/javascript",
         })
       );

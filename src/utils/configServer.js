@@ -1,7 +1,6 @@
 httpPort = 3000;
 phpPort = 8000;
-
-domain = "localhost";
+domain = "192.168.15.158";
 
 module.exports = {
   httpPort,

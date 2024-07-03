@@ -1,5 +1,5 @@
 const { v4: uuidv4 } = require("uuid");
-const Routes = require("../utils/server/routes");
+const Routes = require("../utils/server/classRoutes");
 
 class Client {
   constructor(socket, userAgent, ipAddress) {
